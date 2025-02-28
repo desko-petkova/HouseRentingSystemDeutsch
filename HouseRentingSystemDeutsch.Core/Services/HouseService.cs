@@ -24,5 +24,27 @@ namespace HouseRentingSystemDeutsch.Core.Services
                })
                .ToListAsync();
         }
+
+        public async Task<HouseDetailsViewModel> HouseDetails(int id)
+        {
+            var house = await data.Houses
+            .Where(h => h.Id == id)
+            .Select(h => new HouseDetailsViewModel
+            {
+                Id = h.Id,
+                Title = h.Title,
+                Description = h.Description,
+                PricePerMonth = h.PricePerMonth,
+                ImageUrl = h.ImageUrl,
+                Address = h.Address,
+
+            }).FirstOrDefaultAsync();
+
+            if (house == null)
+            {
+                throw new Exception("House not found");
+            }
+            return house;
+        }
     }
 }

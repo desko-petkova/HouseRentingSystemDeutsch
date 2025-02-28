@@ -10,5 +10,6 @@ namespace HouseRentingSystemDeutsch.Core.Contracts
     public interface IHouseService
     {
         Task<IEnumerable<HouseIndexServiceModel>> AllHousesListAsync();
+        Task<HouseDetailsViewModel> HouseDetails(int id);
     }
 }
