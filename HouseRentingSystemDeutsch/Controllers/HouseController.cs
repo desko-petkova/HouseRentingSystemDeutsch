@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HouseRentingSystemDeutsch.Core.Contracts;
+using HouseRentingSystemDeutsch.Core.Models.House;
 namespace HouseRentingSystemDeutch.Controllers
 {
     [Authorize]
@@ -12,20 +13,37 @@ namespace HouseRentingSystemDeutch.Controllers
             house = _house;
         }
 
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> All()
+        [AllowAnonymous, HttpGet]
+        public async Task<IActionResult> All([FromQuery]HouseQueryServiceModel query)
         {
-            var model = await house.AllHousesListAsync();
-            return View(model);
+            var queryResult = await house.AllAsync(
+                query.Category,
+                query.SearchTerm,
+                query.Sorting,
+                query.CurrentPage,
+                query.HousesPerPage);
+            query.TotalHouseCount = queryResult.TotalHouseCount;
+            query.Houses = queryResult.Houses;
+            query.Categories = await house.AllCategoriesNames();
+            return View(query);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Details(int id)
-        {
-            var model = await house.HouseDetails(id);
-            return View(model);
 
-        }
+
+        //[AllowAnonymous]
+        //[HttpGet]
+        //public async Task<IActionResult> All()
+        //{
+        //    var model = await house.AllHousesListAsync();
+        //    return View(model);
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> Details(int id)
+        //{
+        //    var model = await house.HouseDetails(id);
+        //    return View(model);
+
+        //}
     }
 }
