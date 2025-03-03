@@ -12,8 +12,7 @@ namespace HouseRentingSystemDeutsch.Core.Services
         {
             data = _data;
         }
-        //Наименованията на категориите, които ще се показват в падащото меню 
-        //на фълтъра по категории
+          
         public async Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync()
         {
             return await data.Categories
@@ -22,23 +21,29 @@ namespace HouseRentingSystemDeutsch.Core.Services
                     Id = c.Id,
                     Name = c.Name,
                 }).ToListAsync();
+            //Извлича всички категории къщи от таблица Categories.
         }
 
         public async Task<IEnumerable<string>> AllCategoriesNames()
         {
             return await data.Categories
                 .AsNoTracking()
-                .Select(c=>c.Name).ToListAsync();
+                .Select(c=>c.Name).ToListAsync(); 
+            //Връща само имената на всички категории като списък от стрингове.
         } 
         public async Task<HouseQueryServiceModel> AllAsync(string? category = null, string? searchTerm = null, HouseSorting sorting = HouseSorting.Newest, int currentPage = 1, int housesPerPage = 1)
         {
+            //Създава заявка към таблицата Houses, която позволява
+            //динамично добавяне на филтри и сортиране
             var housesToShow = data.Houses.AsNoTracking().AsQueryable();
+            //Зарежда къщи от дадена категория
             if (category != null)
             {
                 housesToShow = housesToShow
                     .Where(h => h.Category.Name == category);
             }
-            if(searchTerm != null)
+            //case-insensitive търсене в полетата Title, Address и Description
+            if (searchTerm != null)
             {
                 string normalizedSearchTerm = searchTerm.ToLower();
                 housesToShow = housesToShow
@@ -46,33 +51,36 @@ namespace HouseRentingSystemDeutsch.Core.Services
                     h.Address.ToLower().Contains(normalizedSearchTerm)||
                     h.Description.ToLower().Contains(normalizedSearchTerm));
             }
+            //динамично сортиране по:
             housesToShow = sorting switch
             {
                HouseSorting.Price => housesToShow
-               .OrderBy(h=>h.PricePerMonth),
-               HouseSorting.NotRentedFirst =>housesToShow
+               .OrderBy(h=>h.PricePerMonth), //най-ниска цена
+                HouseSorting.NotRentedFirst =>housesToShow
                .OrderBy(h=>h.RenterId !=null)
-               .ThenByDescending(h=>h.Id),
-               _=>housesToShow.OrderByDescending(h=>h.Id)
+               .ThenByDescending(h=>h.Id),  //първо къщи без наематели, а после по подразбиране
+                _ =>housesToShow.OrderByDescending(h=>h.Id)//по подразбиране най-нови къщи първо
             };
-            var houses =await housesToShow
-                .Skip((currentPage-1)*housesPerPage)
-                .Take(housesPerPage)
-                .Select(h=> new HouseServiceModel()
+            //страниране
+            var houses = await housesToShow
+                .Skip((currentPage - 1) * housesPerPage)//Пропуска записите за предходните страници
+                .Take(housesPerPage)//Взима само записите за текущата страница.
+                .Select(h => new HouseServiceModel()
                 {
                     Id = h.Id,
-                    Address=h.Address,
-                    ImageUrl =h.ImageUrl,
-                    PricePerMonth=h.PricePerMonth,
+                    Address = h.Address,
+                    ImageUrl = h.ImageUrl,
+                    PricePerMonth = h.PricePerMonth,
                     Title = h.Title,
-                    IsRented = h.RenterId !=null
+                    IsRented = h.RenterId != null
                 })
                 .ToListAsync();
-            int totalHouses = await housesToShow.CountAsync();
+
+            int totalHouses = await housesToShow.CountAsync();//Броят на всички къщи, които отговарят на филтрите
             return new HouseQueryServiceModel()
             {
-                Houses = houses,
-                TotalHouseCount = totalHouses
+                Houses = houses, //Списък с къщи за текущата страница.
+                TotalHouseCount = totalHouses// Общият брой къщи 
             };
         }
 
