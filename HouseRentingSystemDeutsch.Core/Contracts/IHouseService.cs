@@ -11,7 +11,7 @@ namespace HouseRentingSystemDeutsch.Core.Contracts
     {
         // Task<IEnumerable<HouseIndexServiceModel>> AllHousesListAsync();
         //  Task<HouseDetailsViewModel> HouseDetails(int id);
-        Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync();
+       // Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync();
         Task<IEnumerable<string>> AllCategoriesNames();
         Task<HouseQueryServiceModel> AllAsync(
             string? category = null,

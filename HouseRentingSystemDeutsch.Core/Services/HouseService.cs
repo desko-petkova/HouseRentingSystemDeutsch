@@ -13,16 +13,16 @@ namespace HouseRentingSystemDeutsch.Core.Services
             data = _data;
         }
           
-        public async Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync()
-        {
-            return await data.Categories
-                .Select(c => new HouseCategoryServiceModel
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                }).ToListAsync();
-            //Извлича всички категории къщи от таблица Categories.
-        }
+        //public async Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync()
+        //{
+        //    return await data.Categories
+        //        .Select(c => new HouseCategoryServiceModel
+        //        {
+        //            Id = c.Id,
+        //            Name = c.Name,
+        //        }).ToListAsync();
+        //    //Извлича всички категории къщи от таблица Categories.
+        //}
 
         public async Task<IEnumerable<string>> AllCategoriesNames()
         {
