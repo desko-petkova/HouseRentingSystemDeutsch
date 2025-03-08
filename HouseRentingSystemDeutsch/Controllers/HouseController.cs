@@ -27,23 +27,17 @@ namespace HouseRentingSystemDeutch.Controllers
             query.Categories = await house.AllCategoriesNames();
             return View(query);
         }
+        [AllowAnonymous, HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            if (await house.ExistsAsync(id) == false)
+            {
+                return BadRequest();
+            }
 
+            var model = await house.HouseDetailsByIdAsync(id);
+            return View(model);
 
-
-        //[AllowAnonymous]
-        //[HttpGet]
-        //public async Task<IActionResult> All()
-        //{
-        //    var model = await house.AllHousesListAsync();
-        //    return View(model);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> Details(int id)
-        //{
-        //    var model = await house.HouseDetails(id);
-        //    return View(model);
-
-        //}
+        }
     }
 }

@@ -20,5 +20,8 @@ namespace HouseRentingSystemDeutsch.Core.Contracts
             int currentPage = 1,
             int housesPerPage = 1);
 
+        Task<bool> ExistsAsync(int id);
+        Task<HouseDetailsViewModel> HouseDetailsByIdAsync(int id);
+
     }
 }

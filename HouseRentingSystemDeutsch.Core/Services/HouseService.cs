@@ -12,18 +12,6 @@ namespace HouseRentingSystemDeutsch.Core.Services
         {
             data = _data;
         }
-          
-        //public async Task<IEnumerable<HouseCategoryServiceModel>> AllHouseCategoryAsync()
-        //{
-        //    return await data.Categories
-        //        .Select(c => new HouseCategoryServiceModel
-        //        {
-        //            Id = c.Id,
-        //            Name = c.Name,
-        //        }).ToListAsync();
-        //    //Извлича всички категории къщи от таблица Categories.
-        //}
-
         public async Task<IEnumerable<string>> AllCategoriesNames()
         {
             return await data.Categories
@@ -84,45 +72,38 @@ namespace HouseRentingSystemDeutsch.Core.Services
             };
         }
 
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await data.Houses
+                 .AnyAsync(h => h.Id == id);
+        }
 
-       
+        public async Task<HouseDetailsViewModel?> HouseDetailsByIdAsync(int id)
+        {
+            var house = await data.Houses
+                .Where(h => h.Id == id)
+                .Select(h => new HouseDetailsViewModel()
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    Description = h.Description,
+                    PricePerMonth = h.PricePerMonth,
+                    ImageUrl = h.ImageUrl,
+                    Address = h.Address,
+                    Category = h.Category.Name,
+                    IsRented = h.RenterId != null,
+                    Agent = new AgentServiceModel()
+                    {
+                        PhoneNumber = h.Agent.PhoneNumber,
+                        Email = h.Agent.User.Email
+                    }
+                }).FirstOrDefaultAsync();
 
-
-
-
-        //public async Task<IEnumerable<HouseIndexServiceModel>> AllHousesListAsync()
-        //{
-        //    return await data.Houses
-        //       .OrderByDescending(h => h.Id)
-        //       .Select(h => new HouseIndexServiceModel()
-        //       {
-        //           Id = h.Id,
-        //           Title = h.Title,
-        //           ImageUrl = h.ImageUrl
-        //       })
-        //       .ToListAsync();
-        //}
-
-        //public async Task<HouseDetailsViewModel> HouseDetails(int id)
-        //{
-        //    var house = await data.Houses
-        //    .Where(h => h.Id == id)
-        //    .Select(h => new HouseDetailsViewModel
-        //    {
-        //        Id = h.Id,
-        //        Title = h.Title,
-        //        Description = h.Description,
-        //        PricePerMonth = h.PricePerMonth,
-        //        ImageUrl = h.ImageUrl,
-        //        Address = h.Address,
-
-        //    }).FirstOrDefaultAsync();
-
-        //    if (house == null)
-        //    {
-        //        throw new Exception("House not found");
-        //    }
-        //    return house;
-        //}
+            if (house == null)
+            {
+                throw new Exception("House not found");
+            }
+            return house;
+        }
     }
 }
